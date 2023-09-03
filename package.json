@@ -10,14 +10,8 @@
     "tauri": "tauri dev"
   },
   "dependencies": {
-    "@milkdown/core": "^7.3.0",
-    "@milkdown/ctx": "^7.3.0",
-    "@milkdown/preset-commonmark": "^7.3.0",
-    "@milkdown/prose": "^7.3.0",
-    "@milkdown/theme-nord": "^7.3.0",
-    "@milkdown/transformer": "^7.3.0",
-    "@milkdown/vue": "^7.3.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vuetify": "^3.3.15"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",

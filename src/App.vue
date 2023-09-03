@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import Markdown from "./components/MarkdownEditor.vue";
-import { MilkdownProvider } from "@milkdown/vue";
+import { useTheme } from "vuetify";
+
+const theme = useTheme();
+
+function toggleTheme() {
+  theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
+}
 </script>
 
 <template>
-  <MilkdownProvider>
+  <v-app>
+    <v-btn @click="toggleTheme">toggle theme</v-btn>
     <Markdown />
-  </MilkdownProvider>
+  </v-app>
 </template>
