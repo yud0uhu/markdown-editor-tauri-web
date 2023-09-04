@@ -2,21 +2,21 @@
   <v-app>
     <v-row>
       <v-col cols="6">
-        <v-card>
+        <v-card class="editor-card">
           <v-card-text>
             <textarea
               v-model="markdownText"
               rows="10"
-              style="width: 100%"
+              class="editor-textarea"
             ></textarea>
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="6">
-        <v-card>
+        <v-card class="preview-card">
           <v-card-text>
-            <div v-html="parsedMarkdown"></div>
+            <div v-html="parsedMarkdown" class="preview-content"></div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -54,5 +54,20 @@ This is a demo for using Milkdown with **Vue**.`);
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
+}
+.editor-card,
+.preview-card {
+  height: 100vh;
+  overflow-y: auto;
+  border-radius: "0";
+}
+
+.editor-textarea {
+  height: 100vh;
+  overflow-y: auto;
+}
+.preview-content {
+  height: 100%;
+  padding: 16px;
 }
 </style>
