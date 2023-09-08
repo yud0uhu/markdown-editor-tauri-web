@@ -6,6 +6,7 @@
           <v-card-text>
             <textarea
               v-model="markdownText"
+              :editorConfigs="editorConfigs"
               rows="10"
               class="editor-textarea"
             ></textarea>
@@ -24,9 +25,11 @@
   </v-app>
 </template>
 
-<script>
-import { computed, ref } from "vue";
+<script lang="ts">
+import hljs from "highlight.js";
+import { reactive, computed, ref } from "vue";
 import { marked } from "marked";
+import "highlight.js/styles/nord.css";
 
 export default {
   setup() {
@@ -34,13 +37,43 @@ export default {
 
 > You're scared of a world where you're needed.
 
-This is a demo for using Milkdown with **Vue**.`);
+This is a demo for using Milkdown with **Vue**.
+
+function init() {
+  var name = “Mozilla”;
+  function displayName() {
+    console.log(name);
+  }
+  displayName();
+}
+Init();
+`);
 
     const parsedMarkdown = computed(() => {
       return marked(markdownText.value);
     });
 
-    return { markdownText, parsedMarkdown };
+    marked.setOptions({
+      langPrefix: "",
+      highlight: function (code, lang) {
+        return hljs.highlightAuto(code, [lang]).value;
+      },
+    });
+    const editorConfigs = reactive({
+      codeBlock: {
+        languages: [
+          { language: "javascript", label: "JS" },
+          { language: "css", label: "CSS" },
+          { language: "html", label: "HTML" },
+        ],
+      },
+    });
+    return {
+      marked,
+      markdownText,
+      parsedMarkdown,
+      editorConfigs,
+    };
   },
 };
 </script>
@@ -63,6 +96,7 @@ This is a demo for using Milkdown with **Vue**.`);
 }
 
 .editor-textarea {
+  width: 100%;
   height: 100vh;
   overflow-y: auto;
 }
