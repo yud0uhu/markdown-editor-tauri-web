@@ -1,17 +1,31 @@
-<script setup lang="ts">
-import Markdown from "./components/MarkdownEditor.vue";
-import { useTheme } from "vuetify";
-
-const theme = useTheme();
-
-function toggleTheme() {
-  theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
-}
-</script>
-
 <template>
   <v-app>
-    <v-btn @click="toggleTheme">toggle theme</v-btn>
-    <Markdown />
+    <Header
+      :isEditorFullScreen="isEditorFullScreen"
+      :isPreviewFullScreen="isPreviewFullScreen"
+      @update:isEditorFullScreen="onUpdateIsEditorFullScreen"
+      @update:isPreviewFullScreen="onUpdateIsPreviewFullScreen"
+    />
+    <MarkdownEditor
+      :isEditorFullScreen="isEditorFullScreen"
+      :isPreviewFullScreen="isPreviewFullScreen"
+    />
   </v-app>
 </template>
+
+<script setup lang="ts">
+import Header from "./components/Header.vue";
+import MarkdownEditor from "./components/MarkdownEditor.vue";
+
+import { ref } from "vue";
+const isEditorFullScreen = ref(false);
+const isPreviewFullScreen = ref(false);
+
+const onUpdateIsEditorFullScreen = (value: boolean) => {
+  isEditorFullScreen.value = value;
+};
+
+const onUpdateIsPreviewFullScreen = (value: boolean) => {
+  isPreviewFullScreen.value = value;
+};
+</script>
