@@ -10,8 +10,10 @@
     "tauri": "tauri dev"
   },
   "dependencies": {
+    "@mdi/font": "^7.2.96",
     "highlight.js": "^11.8.0",
     "marked": "^8.0.0",
+    "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.3.4",
     "vuetify": "^3.3.15"
   },
