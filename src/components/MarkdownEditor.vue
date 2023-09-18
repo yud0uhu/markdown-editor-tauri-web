@@ -14,7 +14,6 @@
           </v-card-text>
         </v-card>
       </v-col>
-
       <v-col :style="previewStyle">
         <v-card class="preview-card width-100">
           <v-card-text>
@@ -31,89 +30,74 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import hljs from "highlight.js";
-import { reactive, computed, ref } from "vue";
+import { reactive, computed, ref, defineProps, watch } from "vue";
 import { marked } from "marked";
 import "highlight.js/styles/nord.css";
-import { mdiPencil, mdiEye } from "@mdi/js";
-export default {
-  props: {
-    isEditorFullScreen: Boolean,
-    isPreviewFullScreen: Boolean,
-    toggleTheme: Function,
-  },
-  data: () => ({
-    mdiPencil,
-    mdiEye,
-  }),
-  setup(props) {
-    const isEditorFullScreen = ref(false);
-    const isPreviewFullScreen = ref(false);
-    const markdownText = ref(`# Milkdown Vue Commonmark
 
-> You're scared of a world where you're needed.
+const emits = defineEmits(["update:onMarkdownUpdate", "update:markdownText"]);
 
-This is a demo for using Milkdown with **Vue**.
+const props = defineProps({
+  isEditorFullScreen: Boolean,
+  isPreviewFullScreen: Boolean,
+  toggleTheme: Function,
+  markdownText: String,
+  onMarkdownUpdate: Function,
+});
+const isEditorFullScreen = ref(false);
+const isPreviewFullScreen = ref(false);
+const markdownText = ref("");
 
-function init() {
-  var name = "Mozilla";
-  function displayName() {
-    console.log(name);
-  }
-  displayName();
-}
-Init();
-`);
-
-    const parsedMarkdown = computed(() => {
-      return marked(markdownText.value);
-    });
-
-    marked.use({
-      renderer: {
-        code(code, language) {
-          language = language ? language : "";
-          const validLanguage = hljs.getLanguage(language)
-            ? language
-            : "plaintext";
-          return `<pre><code class="hljs ${validLanguage}">${
-            hljs.highlight(validLanguage, code).value
-          }</code></pre>`;
-        },
-      },
-    });
-
-    const editorConfigs = reactive({
-      codeBlock: {
-        languages: [
-          { language: "javascript", label: "JS" },
-          { language: "css", label: "CSS" },
-          { language: "html", label: "HTML" },
-        ],
-      },
-    });
-
-    const editorStyle = computed(() => ({
-      display: props.isPreviewFullScreen ? "none" : "block",
-    }));
-
-    const previewStyle = computed(() => ({
-      display: props.isEditorFullScreen ? "none" : "block",
-    }));
-
-    return {
-      marked,
-      markdownText,
-      parsedMarkdown,
-      editorConfigs,
-      isEditorFullScreen,
-      isPreviewFullScreen,
-      editorStyle,
-      previewStyle,
-    };
-  },
+const onMarkdownUpdate = (value: string) => {
+  emits("update:onMarkdownUpdate", value);
+  emits("update:markdownText", value);
 };
+watch(
+  () => props.markdownText,
+  (newValue) => {
+    if (newValue !== markdownText.value && newValue) {
+      markdownText.value = newValue;
+      console.log("watch:" + markdownText.value);
+      onMarkdownUpdate(markdownText.value);
+    }
+  }
+);
+
+const parsedMarkdown = computed(() => {
+  emits("update:onMarkdownUpdate", markdownText.value);
+  return marked(markdownText.value);
+});
+
+marked.use({
+  renderer: {
+    code(code, language) {
+      language = language ? language : "";
+      const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+      return `<pre><code class="hljs ${validLanguage}">${
+        hljs.highlight(validLanguage, code).value
+      }</code></pre>`;
+    },
+  },
+});
+
+const editorConfigs = reactive({
+  codeBlock: {
+    languages: [
+      { language: "javascript", label: "JS" },
+      { language: "css", label: "CSS" },
+      { language: "html", label: "HTML" },
+    ],
+  },
+});
+
+const editorStyle = computed(() => ({
+  display: props.isPreviewFullScreen ? "none" : "block",
+}));
+
+const previewStyle = computed(() => ({
+  display: props.isEditorFullScreen ? "none" : "block",
+}));
 </script>
 
 <style scoped>

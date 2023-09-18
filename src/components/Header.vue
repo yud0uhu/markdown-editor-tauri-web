@@ -17,28 +17,33 @@
             }}
           </v-icon>
         </v-btn>
+        <v-btn @click="toggleWindowFullScreen()" icon v-on="on">
+          <v-icon :color="isWindowFullScreen ? 'grey' : ''"
+            >mdi-arrow-expand-all</v-icon
+          >
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn @click="showDrawer = !showDrawer" icon>
           <v-icon>mdi-menu</v-icon>
         </v-btn>
         <v-navigation-drawer v-model="showDrawer" right>
           <v-list>
-            <v-list-item @click="openFile">
-              <v-list-item-icon>
+            <v-list-item @click="fileOpen">
+              <v-list-item>
                 <v-icon>mdi-folder-open</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
+              </v-list-item>
+              <v-list-item>
                 <v-list-item-title>File Open</v-list-item-title>
-              </v-list-item-content>
+              </v-list-item>
             </v-list-item>
 
-            <v-list-item @click="saveFile">
-              <v-list-item-icon>
+            <v-list-item @click="fileSave">
+              <v-list-item>
                 <v-icon>mdi-content-save</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
+              </v-list-item>
+              <v-list-item>
                 <v-list-item-title>File Save</v-list-item-title>
-              </v-list-item-content>
+              </v-list-item>
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
@@ -48,30 +53,47 @@
 </template>
 
 <script setup lang="ts">
+import { defineProps, watch } from "vue";
 import { useTheme } from "vuetify/lib/framework.mjs";
 import { ref } from "vue";
+import { appWindow } from "@tauri-apps/api/window";
 
 const props = defineProps({
   isEditorFullScreen: Boolean,
   isPreviewFullScreen: Boolean,
+  isWindowFullScreen: Boolean,
+  markdownText: String,
 });
+
 const emits = defineEmits([
   "update:isEditorFullScreen",
   "update:isPreviewFullScreen",
+  "update:isWindowFullScreen",
+  "update:markdownUpdate",
+  "fileOpen",
+  "fileSave",
 ]);
 
 const showDrawer = ref(false);
 const theme = useTheme();
-
 const isEditorFullScreen = ref(props.isEditorFullScreen);
 const isPreviewFullScreen = ref(props.isPreviewFullScreen);
-const openFile = () => {
-  // TODO: ファイルを開く処理
+const isWindowFullScreen = ref(props.isWindowFullScreen);
+
+const toggleWindowFullScreen = async () => {
+  await appWindow.center();
+  await appWindow.maximize();
+  await appWindow.setFocus();
 };
 
-const saveFile = () => {
-  // TODO: ファイルを保存する処理
+const fileOpen = () => {
+  emits("fileOpen");
 };
+
+const fileSave = () => {
+  emits("fileSave");
+};
+
 function toggleFullScreen(cardType: string) {
   if (cardType === "editor") {
     isEditorFullScreen.value = !isEditorFullScreen.value;
