@@ -3,8 +3,10 @@
     <Header
       :isEditorFullScreen="isEditorFullScreen"
       :isPreviewFullScreen="isPreviewFullScreen"
+      :isWindowFullScreen="isWindowFullScreen"
       @update:isEditorFullScreen="onUpdateIsEditorFullScreen"
       @update:isPreviewFullScreen="onUpdateIsPreviewFullScreen"
+      @update:onUpdateWindowFullScreen="onUpdateWindowFullScreen"
       @fileOpen="openFile"
       @fileSave="saveFile"
     />
@@ -28,8 +30,12 @@ import { appDir } from "@tauri-apps/api/path";
 
 const isEditorFullScreen = ref(false);
 const isPreviewFullScreen = ref(false);
+const isWindowFullScreen = ref(false);
 const markdownText = ref("");
 
+/**
+ * @deprecated appDir(): Promise<string>
+ */
 const openFile = async () => {
   try {
     const selected = await open({
@@ -46,8 +52,6 @@ const openFile = async () => {
         console.log("hoge:" + contents);
         onMarkdownUpdate(contents);
       }
-    } else {
-      // user cancelled the selection
     }
   } catch (error) {
     console.error(error);
@@ -82,6 +86,10 @@ const onUpdateIsEditorFullScreen = (value: boolean) => {
 
 const onUpdateIsPreviewFullScreen = (value: boolean) => {
   isPreviewFullScreen.value = value;
+};
+
+const onUpdateWindowFullScreen = (value: boolean) => {
+  isWindowFullScreen.value = value;
 };
 
 const emits = defineEmits(["update:markdownText"]);

@@ -2,13 +2,13 @@
   <v-row class="header" align="end">
     <v-col class="ml-auto">
       <v-toolbar>
-        <v-btn @click="toggleFullScreen('editor')" icon v-on="on">
+        <v-btn @click="toggleFullScreen('editor')" icon>
           <v-icon :color="isEditorFullScreen ? 'grey' : ''">mdi-pencil</v-icon>
         </v-btn>
-        <v-btn @click="toggleFullScreen('preview')" icon v-on="on">
+        <v-btn @click="toggleFullScreen('preview')" icon>
           <v-icon :color="isPreviewFullScreen ? 'grey' : ''">mdi-eye</v-icon>
         </v-btn>
-        <v-btn @click="toggleTheme" icon v-on="on">
+        <v-btn @click="toggleTheme" icon>
           <v-icon>
             {{
               theme.global.current.value.dark
@@ -17,16 +17,16 @@
             }}
           </v-icon>
         </v-btn>
-        <v-btn @click="toggleWindowFullScreen()" icon v-on="on">
+        <v-btn @click="toggleWindowFullScreen()" icon>
           <v-icon :color="isWindowFullScreen ? 'grey' : ''"
             >mdi-arrow-expand-all</v-icon
           >
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn @click="showDrawer = !showDrawer" icon>
+        <v-btn @click="showDrawer()" icon>
           <v-icon>mdi-menu</v-icon>
         </v-btn>
-        <v-navigation-drawer v-model="showDrawer" right>
+        <v-navigation-drawer v-model="isShowDrawer" right>
           <v-list>
             <v-list-item @click="fileOpen">
               <v-list-item>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, watch } from "vue";
+import { defineProps } from "vue";
 import { useTheme } from "vuetify/lib/framework.mjs";
 import { ref } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
@@ -74,13 +74,30 @@ const emits = defineEmits([
   "fileSave",
 ]);
 
-const showDrawer = ref(false);
+const isShowDrawer = ref(false);
 const theme = useTheme();
 const isEditorFullScreen = ref(props.isEditorFullScreen);
 const isPreviewFullScreen = ref(props.isPreviewFullScreen);
 const isWindowFullScreen = ref(props.isWindowFullScreen);
 
+const showDrawer = async () => {
+  isShowDrawer.value = !isShowDrawer.value;
+};
 const toggleWindowFullScreen = async () => {
+  isWindowFullScreen.value = !isWindowFullScreen.value;
+  if (isWindowFullScreen.value == false) {
+    maximizeWindow();
+  }
+  if (isWindowFullScreen.value == true) {
+    minimizeWindow();
+  }
+};
+const minimizeWindow = async () => {
+  await appWindow.center();
+  await appWindow.minimize();
+  await appWindow.setFocus();
+};
+const maximizeWindow = async () => {
   await appWindow.center();
   await appWindow.maximize();
   await appWindow.setFocus();
