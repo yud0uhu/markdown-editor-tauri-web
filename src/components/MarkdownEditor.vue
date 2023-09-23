@@ -33,9 +33,10 @@
 <script setup lang="ts">
 import hljs from "highlight.js";
 import { reactive, computed, ref, defineProps, watch } from "vue";
-import { marked } from "marked";
+import MarkdownIt from "markdown-it";
 import "highlight.js/styles/nord.css";
 
+const md = new MarkdownIt();
 const emits = defineEmits(["update:onMarkdownUpdate", "update:markdownText"]);
 
 const props = defineProps({
@@ -66,20 +67,16 @@ watch(
 
 const parsedMarkdown = computed(() => {
   emits("update:onMarkdownUpdate", markdownText.value);
-  return marked(markdownText.value);
+  return md.render(markdownText.value);
 });
 
-marked.use({
-  renderer: {
-    code(code, language) {
-      language = language ? language : "";
-      const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+md.options.highlight = function (code, lang) {
+  lang = lang || "plaintext";
+  const validLanguage = hljs.getLanguage(lang) ? lang : "plaintext";
       return `<pre><code class="hljs ${validLanguage}">${
         hljs.highlight(validLanguage, code).value
       }</code></pre>`;
-    },
-  },
-});
+};
 
 const editorConfigs = reactive({
   codeBlock: {
