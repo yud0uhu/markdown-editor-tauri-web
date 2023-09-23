@@ -25,6 +25,20 @@
               >
                 <v-list>
                   <v-list-item
+                    v-for="(item, i) in suggestList"
+                    :key="i"
+                    :value="item"
+                    color="primary"
+                    @click="selectSuggestion(item.text)"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon :icon="item.icon" v-if="item.icon"></v-icon>
+                    </template>
+
+                    <v-list-item-title v-text="item.text"></v-list-item-title>
+                  </v-list-item>
+                  <!-- <v-list-item
+                  
                     v-for="item in suggestList"
                     :key="item"
                     @click="selectSuggestion(item)"
@@ -32,7 +46,7 @@
                     <v-list-item-content>
                       <v-list-item-title>{{ item }}</v-list-item-title>
                     </v-list-item-content>
-                  </v-list-item>
+                  </v-list-item> -->
                 </v-list>
               </v-menu>
             </v-card-text>
@@ -61,10 +75,11 @@ import { reactive, computed, ref, defineProps, watch } from "vue";
 import MarkdownIt from "markdown-it";
 import "highlight.js/styles/nord.css";
 import ToolBar from "./ToolBar.vue";
+import emoji from "markdown-it-emoji";
 
 const md = new MarkdownIt();
 const emits = defineEmits(["update:onMarkdownUpdate", "update:markdownText"]);
-
+md.use(emoji);
 const props = defineProps({
   isEditorFullScreen: Boolean,
   isPreviewFullScreen: Boolean,
@@ -127,49 +142,60 @@ const previewStyle = computed(() => ({
   display: props.isEditorFullScreen ? "none" : "block",
 }));
 const inputText = ref("");
-const suggestList = ref([""]);
+const suggestList = ref([
+  {
+    text: "",
+    icon: "",
+  },
+]);
 const showSuggest = ref(false);
 const updateSuggestList = (markdownText: string) => {
   const input = inputText.value.toLowerCase();
   console.log(markdownText);
   // TODO:hサジェスト
+  suggestList.value = [];
   if (markdownText.trim().startsWith("#")) {
     suggestList.value = [
-      "# h1",
-      "## h2",
-      "### h3",
-      "#### h4",
-      "##### h5",
-      "###### h6",
-    ].filter((item) => item.toLowerCase().includes(input));
+      { text: "# h1", icon: "" },
+      { text: "## h2", icon: "" },
+      { text: "### h3", icon: "" },
+      { text: "#### h4", icon: "" },
+      { text: "##### h5", icon: "" },
+      { text: "###### h6", icon: "" },
+    ];
   }
 
-  // if (/^:/.test(markdownText)) {
-  //   suggestList.value = [
-  //     ":smile:",
-  //     ":heart:",
-  //     ":star:",
-  //     ":+1:",
-  //     ":-1:",
-  //     ":bell:",
-  //     ":fire:",
-  //     ":ok_hand:",
-  //     ":rocket:",
-  //     ":speech_balloon:",
-  //     ":mag:",
-  //     ":bulb:",
-  //     ":moneybag:",
-  //     ":camera:",
-  //     ":trophy:",
-  //     ":gift:",
-  //     ":hourglass:",
-  //     ":envelope:",
-  //     ":link:",
-  //     ":lock:",
-  //   ].filter((item) => item.toLowerCase().includes(input));
-  //   showSuggest.value = !!suggestList.value.length;
-  // }
+  if (/^:/.test(markdownText)) {
+    suggestList.value = [
+      { text: ":smile:", icon: "mdi-emoticon-happy" },
+      { text: ":heart:", icon: "mdi-heart" },
+      { text: ":star:", icon: "mdi-star" },
+      { text: ":+1:", icon: "mdi-thumb-up" },
+      { text: ":-1:", icon: "mdi-thumb-down" },
+      { text: ":bell:", icon: "mdi-bell" },
+      { text: ":fire:", icon: "mdi-fire" },
+      { text: ":ok_hand:", icon: "mdi-thumb-up" },
+      { text: ":rocket:", icon: "mdi-rocket" },
+      { text: ":speech_balloon:", icon: "mdi-message-text-outline" },
+      { text: ":mag:", icon: "mdi-magnify" },
+      { text: ":bulb:", icon: "mdi-lightbulb" },
+      { text: ":moneybag:", icon: "mdi-currency-usd" },
+      { text: ":camera:", icon: "mdi-camera" },
+      { text: ":trophy:", icon: "mdi-trophy" },
+      { text: ":gift:", icon: "mdi-gift" },
+      { text: ":hourglass:", icon: "mdi-hourglass" },
+      { text: ":envelope:", icon: "mdi-email" },
+      { text: ":link:", icon: "mdi-link" },
+      { text: ":lock:", icon: "mdi-lock" },
+    ];
+  }
+
+  suggestList.value = suggestList.value.filter((item) =>
+    item.text.toLowerCase().includes(input)
+  );
+  showSuggest.value = !!suggestList.value.length;
 };
+
 const selectSuggestion = (suggestion: string) => {
   const newText = markdownText.value + suggestion.substring(1);
   markdownText.value = newText;
