@@ -18,13 +18,14 @@
               ></textarea>
 
               <v-menu
-                v-model="showSuggest"
-                right
-                offset-y="10"
+                bottom
                 transition="scale-transition"
+                v-model="showSuggest"
+                focusable
               >
                 <v-list>
                   <v-list-item
+                    autofocus
                     v-for="(item, i) in suggestList"
                     :key="i"
                     :value="item"
@@ -37,16 +38,6 @@
 
                     <v-list-item-title v-text="item.text"></v-list-item-title>
                   </v-list-item>
-                  <!-- <v-list-item
-                  
-                    v-for="item in suggestList"
-                    :key="item"
-                    @click="selectSuggestion(item)"
-                  >
-                    <v-list-item-content>
-                      <v-list-item-title>{{ item }}</v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item> -->
                 </v-list>
               </v-menu>
             </v-card-text>
@@ -165,7 +156,7 @@ const updateSuggestList = (markdownText: string) => {
     ];
   }
 
-  if (/^:/.test(markdownText)) {
+  if (isEmoji) {
     suggestList.value = [
       { text: ":smile:", icon: "mdi-emoticon-happy" },
       { text: ":heart:", icon: "mdi-heart" },
