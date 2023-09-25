@@ -53,7 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
 import { useTheme } from "vuetify/lib/framework.mjs";
 import { ref } from "vue";
 import { appWindow } from "@tauri-apps/api/window";

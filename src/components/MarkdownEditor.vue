@@ -1,13 +1,17 @@
 <template>
   <v-app>
-    <v-container fluid>
-      <v-row>
-        <v-col :style="editorStyle" class="bg-grey-darken-4">
+    <v-container fluid class="no-padding">
+      <v-row class="no-margin">
+        <v-col
+          :style="editorStyle"
+          class="bg-grey-darken-4 no-padding"
+          cols="6"
+        >
           <ToolBar @insert="insertMarkdownText" />
-          <v-card class="editor-card width-100 bg-grey-darken-4">
-            <v-card-text>
+          <v-card class="editor-card bg-grey-darken-4">
+            <v-card-text style="max-width: 100%">
               <textarea
-                @input="updateSuggestList(markdownText)"
+                @input="handleInput"
                 autocomplete="on"
                 list="food"
                 v-if="!isPreviewFullScreen"
@@ -43,14 +47,14 @@
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col :style="previewStyle">
-          <v-card class="preview-card width-100">
-            <v-card-text>
+        <v-col :style="previewStyle" cols="6" class="outlined no-padding">
+          <v-card class="preview-card text-subtitle-2">
+            <v-card-text style="max-width: 100%">
               <div
                 v-if="!isEditorFullScreen"
                 rows="10"
                 v-html="parsedMarkdown"
-                class="preview-content"
+                class="preview-content text-subtitle-2"
               ></div>
             </v-card-text>
           </v-card>
@@ -62,15 +66,17 @@
 
 <script setup lang="ts">
 import hljs from "highlight.js";
-import { reactive, computed, ref, defineProps, watch } from "vue";
+import { reactive, computed, ref, watch } from "vue";
 import MarkdownIt from "markdown-it";
 import "highlight.js/styles/nord.css";
 import ToolBar from "./ToolBar.vue";
 import emoji from "markdown-it-emoji";
+import { invoke } from "@tauri-apps/api";
 
 const md = new MarkdownIt();
 const emits = defineEmits(["update:onMarkdownUpdate", "update:markdownText"]);
 md.use(emoji);
+
 const props = defineProps({
   isEditorFullScreen: Boolean,
   isPreviewFullScreen: Boolean,
@@ -101,9 +107,23 @@ watch(
     }
   }
 );
-
+const finalMarkdown = ref("");
 const parsedMarkdown = computed(() => {
+  if (isMermaidCode.value) {
+    markdownText.value = markdownText.value.replace(
+      /^```mermaid([\s\S]*?)^```/m,
+      ""
+    );
+    finalMarkdown.value = mermaidImg.value;
+
+    markdownText.value = markdownText.value + finalMarkdown.value;
+
+    finalMarkdown.value = "";
+    console.log(finalMarkdown.value);
+  }
+
   emits("update:onMarkdownUpdate", markdownText.value);
+
   return md.render(markdownText.value);
 });
 
@@ -139,13 +159,49 @@ const suggestList = ref([
     icon: "",
   },
 ]);
+
 const showSuggest = ref(false);
+
+const generateMermaidImg = async (code: string) => {
+  try {
+    const response = await invoke("generate_mermaid_img", { code: code });
+    return response;
+  } catch (error) {
+    console.error("Error calling Rust function:", error);
+  }
+};
+
+const isMermaidCode = ref(false);
+const mermaidImg = ref("");
+const handleInput = async () => {
+  isMermaidCode.value = /^```mermaid[\s\S]*?^```$/m.test(markdownText.value);
+
+  console.log(isMermaidCode.value);
+  mermaidImg.value = "";
+  if (isMermaidCode.value) {
+    try {
+      const codeMatch = markdownText.value.match(/^```mermaid([\s\S]*?)^```$/m);
+      const code = codeMatch ? codeMatch[1].trim() : "";
+
+      const img = await generateMermaidImg(code);
+      console.log(code);
+      mermaidImg.value += `![alt](${img})`;
+    } catch (error) {
+      console.error("Mermaid rendering error:", error);
+      markdownText.value = "";
+    }
+  }
+  updateSuggestList(markdownText.value);
+};
+
 const updateSuggestList = (markdownText: string) => {
   const input = inputText.value.toLowerCase();
+  const isHeading = markdownText.slice(-1).trim().startsWith("#");
+  const isEmoji = markdownText.slice(-1).trim().startsWith(":");
   console.log(markdownText);
   // TODO:hサジェスト
   suggestList.value = [];
-  if (markdownText.trim().startsWith("#")) {
+  if (isHeading) {
     suggestList.value = [
       { text: "# h1", icon: "" },
       { text: "## h2", icon: "" },
@@ -188,14 +244,18 @@ const updateSuggestList = (markdownText: string) => {
 };
 
 const selectSuggestion = (suggestion: string) => {
-  const newText = markdownText.value + suggestion.substring(1);
-  markdownText.value = newText;
-  inputText.value = "";
-  showSuggest.value = false;
+  markdownText.value += suggestion.substring(1);
 };
 </script>
 
 <style scoped>
+.no-padding {
+  padding: 0 !important;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
 .card {
   margin: 20px;
   padding: 20px;
@@ -205,11 +265,18 @@ const selectSuggestion = (suggestion: string) => {
   font-weight: bold;
   margin-bottom: 10px;
 }
-.editor-card,
-.preview-card {
-  height: 100vh;
-  overflow-y: auto;
+.editor-card {
+  height: 100%;
   border-radius: "0";
+}
+.preview-card {
+  height: 100%;
+  border-radius: "0";
+}
+.outlined {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .editor-textarea {
@@ -220,6 +287,7 @@ const selectSuggestion = (suggestion: string) => {
 .preview-content {
   height: 100%;
   padding: 16px;
+  overflow-y: auto;
 }
 
 .v-btn {
@@ -232,10 +300,6 @@ const selectSuggestion = (suggestion: string) => {
 
 .editor-fullscreen {
   width: 100%;
-}
-
-.preview-card {
-  display: flex;
 }
 
 .preview-col {
