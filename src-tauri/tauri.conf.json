@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "yarn vue-tsc && vite build",
+    "beforeBuildCommand": "yarn run dev",
     "devPath": "http://localhost:5173",
     "distDir": "../dist",
     "withGlobalTauri": false
