@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeDevCommand": "yarn vue-tsc && vite build",
-    "beforeBuildCommand": "yarn run dev",
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:5173",
     "distDir": "../dist",
     "withGlobalTauri": false
@@ -51,7 +51,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "mditor.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

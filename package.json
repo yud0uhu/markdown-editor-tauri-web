@@ -4,10 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri dev"
+    "dev": "npm run tauri dev",
+    "build": "npm run tauri build",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
