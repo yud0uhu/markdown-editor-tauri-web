@@ -17,7 +17,7 @@ tauri-build = { version = "1.4.0", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.4.0", features = [ "path-all", "dialog-save", "window-center", "fs-all", "window-set-focus", "window-maximize", "shell-open", "dialog-open"] }
+tauri = { version = "1.4.0", features = [ "window-set-focus", "path-all", "fs-all", "dialog-open", "window-maximize", "window-center", "shell-open", "dialog-save"] }
 percent-encoding = "2.1.0"
 base64 = "0.13.0"
 

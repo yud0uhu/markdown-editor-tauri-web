@@ -286,7 +286,7 @@ const selectSuggestion = (suggestion: string) => {
 }
 .preview-content {
   height: 100%;
-  padding: 16px;
+  padding: 24px;
   overflow-y: auto;
 }
 

@@ -4,9 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "bun:dev": "tauri dev",
+    "bun:build": "vite build",
+    "bun:serve": "vite preview",
     "dev": "vite dev",
     "build": "vite build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev"
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
