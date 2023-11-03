@@ -29,8 +29,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from "vue";
-
 const emits = defineEmits(["insert"]);
 
 const InsertTable = () => {

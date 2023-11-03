@@ -2,14 +2,10 @@
   <v-app>
     <v-container fluid class="no-padding">
       <v-row class="no-margin">
-        <v-col
-          :style="editorStyle"
-          class="bg-grey-darken-4 no-padding"
-          cols="6"
-        >
+        <v-col :style="editorStyle" class="bg-grey-darken-4 no-padding">
           <ToolBar @insert="insertMarkdownText" />
           <v-card class="editor-card bg-grey-darken-4">
-            <v-card-text style="max-width: 100%">
+            <v-card-text>
               <textarea
                 @input="handleInput"
                 autocomplete="on"
@@ -47,17 +43,15 @@
             </v-card-text>
           </v-card>
         </v-col>
-        <v-col :style="previewStyle" cols="6" class="outlined no-padding">
-          <v-card class="preview-card text-subtitle-2">
-            <v-card-text style="max-width: 100%">
-              <div
-                v-if="!isEditorFullScreen"
-                rows="10"
-                v-html="parsedMarkdown"
-                class="preview-content text-subtitle-2"
-              ></div>
-            </v-card-text>
-          </v-card>
+        <v-col :style="previewStyle" class="outlined no-padding">
+          <v-card-text class="preview-card text-subtitle-2">
+            <div
+              v-if="!isEditorFullScreen"
+              rows="10"
+              v-html="parsedMarkdown"
+              class="preview-content text-subtitle-2"
+            ></div>
+          </v-card-text>
         </v-col>
       </v-row>
     </v-container>
@@ -266,12 +260,14 @@ const selectSuggestion = (suggestion: string) => {
   margin-bottom: 10px;
 }
 .editor-card {
-  height: 100%;
+  width: 100%;
+  height: 100vh;
   border-radius: "0";
 }
 .preview-card {
-  height: 100%;
-  border-radius: "0";
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
 }
 .outlined {
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -285,8 +281,9 @@ const selectSuggestion = (suggestion: string) => {
   overflow-y: auto;
 }
 .preview-content {
-  height: 100%;
-  padding: 16px;
+  width: 100%;
+  height: 100vh;
+  padding: 24px;
   overflow-y: auto;
 }
 
@@ -309,9 +306,5 @@ const selectSuggestion = (suggestion: string) => {
 .v-tooltip {
   display: inline-block;
   margin: 0 8px;
-}
-
-.width-100 {
-  width: 100%;
 }
 </style>
